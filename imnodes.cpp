@@ -350,7 +350,11 @@ void ImDrawListGrowChannels(ImDrawList* draw_list, const int num_channels)
         {
             ImDrawCmd draw_cmd;
             draw_cmd.ClipRect = draw_list->_ClipRectStack.back();
+#if IMGUI_VERSION_NUM >= 19200
+            draw_cmd.TexRef = draw_list->_TextureStack.back();
+#else
             draw_cmd.TextureId = draw_list->_TextureIdStack.back();
+#endif
             channel._CmdBuffer.push_back(draw_cmd);
         }
     }
@@ -1537,7 +1541,7 @@ void DrawNode(ImNodesEditorContext& editor, const int node_idx)
                 title_bar_rect.Max,
                 titlebar_background,
                 node.LayoutStyle.CornerRounding,
-                ImDrawFlags_RoundCornersTop);
+                ImDrawFlags_RoundTop);
 
 #endif
         }
@@ -1552,14 +1556,22 @@ void DrawNode(ImNodesEditorContext& editor, const int node_idx)
                 node.LayoutStyle.CornerRounding,
                 ImDrawCornerFlags_All,
                 node.LayoutStyle.BorderThickness);
-#else
+#elif IMGUI_VERSION_NUM < 19280
             GImNodes->CanvasDrawList->AddRect(
                 node.Rect.Min,
                 node.Rect.Max,
                 node.ColorStyle.Outline,
                 node.LayoutStyle.CornerRounding,
-                ImDrawFlags_RoundCornersAll,
+                ImDrawFlags_RoundAll,
                 node.LayoutStyle.BorderThickness);
+#else // 1.92.8 swapped AddRect's last two arguments: thickness, then flags
+            GImNodes->CanvasDrawList->AddRect(
+                node.Rect.Min,
+                node.Rect.Max,
+                node.ColorStyle.Outline,
+                node.LayoutStyle.CornerRounding,
+                node.LayoutStyle.BorderThickness,
+                ImDrawFlags_RoundAll);
 #endif
         }
     }
