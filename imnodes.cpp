@@ -22,6 +22,16 @@
 #include <stdlib.h>
 #include <string.h> // strlen, strncmp
 
+// ImDrawFlags_RoundCorners* became ImDrawFlags_Round* with the 1.92 release. A 1.92.0 WIP (19197, what
+// VkFramework pins) still has the old names, so the rename is gated on the release number, not on 1.92 WIP.
+#if IMGUI_VERSION_NUM >= 19200
+#define IMNODES_ROUND_TOP ImDrawFlags_RoundTop
+#define IMNODES_ROUND_ALL ImDrawFlags_RoundAll
+#else
+#define IMNODES_ROUND_TOP ImDrawFlags_RoundCornersTop
+#define IMNODES_ROUND_ALL ImDrawFlags_RoundCornersAll
+#endif
+
 // Use secure CRT function variants to avoid MSVC compiler errors
 #ifdef _MSC_VER
 #define sscanf sscanf_s
@@ -1541,7 +1551,7 @@ void DrawNode(ImNodesEditorContext& editor, const int node_idx)
                 title_bar_rect.Max,
                 titlebar_background,
                 node.LayoutStyle.CornerRounding,
-                ImDrawFlags_RoundTop);
+                IMNODES_ROUND_TOP);
 
 #endif
         }
@@ -1562,7 +1572,7 @@ void DrawNode(ImNodesEditorContext& editor, const int node_idx)
                 node.Rect.Max,
                 node.ColorStyle.Outline,
                 node.LayoutStyle.CornerRounding,
-                ImDrawFlags_RoundAll,
+                IMNODES_ROUND_ALL,
                 node.LayoutStyle.BorderThickness);
 #else // 1.92.8 swapped AddRect's last two arguments: thickness, then flags
             GImNodes->CanvasDrawList->AddRect(
@@ -1571,7 +1581,7 @@ void DrawNode(ImNodesEditorContext& editor, const int node_idx)
                 node.ColorStyle.Outline,
                 node.LayoutStyle.CornerRounding,
                 node.LayoutStyle.BorderThickness,
-                ImDrawFlags_RoundAll);
+                IMNODES_ROUND_ALL);
 #endif
         }
     }
